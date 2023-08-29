@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "630436438034",
+    "firebase_url": "https://bar-tartine.firebaseio.com",
+    "project_id": "bar-tartine",
+    "storage_bucket": "bar-tartine.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630436438034:android:6f5c33a4f523650267f8cb",
+        "android_client_info": {
+          "package_name": "com.bartartine.live"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "630436438034-un71nseenlual5bst298aafr1aocs47d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClaCZJEM6pM6AfuNJYe2MxGculj4SLig8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "630436438034-un71nseenlual5bst298aafr1aocs47d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "630436438034-jtu4mvief3rsv6uqggus360cq8caf3bv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bartartine.live"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
