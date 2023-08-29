@@ -1,0 +1,65 @@
+<html>
+<head>
+	<script src="https://bobsal.gateway.mastercard.com/checkout/version/36/checkout.js"
+	data-error="errorCallback"
+	data-cancel="cancelCallback"
+	data-complete="completeCallback"
+	data-beforeRedirect="Checkout.saveFormFields"
+	data-afterRedirect="Checkout.restoreFormFields">
+</script>
+<script type="text/javascript">
+
+function errorCallback(error) {
+	//console.log(JSON.stringify(error));
+	window.postMessage(JSON.stringify(error));
+}
+function cancelCallback() {
+	//console.log('Payment cancelled');
+	//window.postMessage("succsees from me cancelCallback");
+}
+function completeCallback() {
+	//console.log('Payment Completed');
+	window.postMessage("success");
+}
+var amount;
+var paymentID=new Date().valueOf();
+Checkout.configure({
+	merchant: 'RD',
+	order: {
+		amount: function () {
+			//Dynamic calculation of amount
+			return amount;
+		},
+		currency: 'USD',
+		description: 'Ordered goods',
+		id: function () {
+			window.postMessage(paymentID);
+			return paymentID; }
+		},
+		interaction: {
+			merchant: {
+				name: 'Bar Tartine',
+				logo: 'https://image.ibb.co/gCdLWx/rd_gateway.png',
+			},
+			displayControl: {
+				billingAddress: 'HIDE',
+				customerEmail: 'HIDE',
+				orderSummary: 'HIDE',
+				shipping: 'HIDE'
+			}
+		}
+	});
+	document.addEventListener("message", function(event) {
+//window.postMessage(JSON.parse(event.data));
+			amount=event.data;
+
+
+	}, false);
+</script>
+</script>
+</head>
+<body>
+<input type="button" value="Pay with Lightbox" onclick="Checkout.showLightbox();" />
+
+</body>
+</html>

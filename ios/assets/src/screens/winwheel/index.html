@@ -1,0 +1,189 @@
+<html>
+<head>
+   <title>My Winning Wheel</title>
+   <script src='Winwheel.min.js'></script>
+   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+   </head>
+   <body>
+
+      <style type="text/css">
+      #myCanvas{background-image: url('bg.jpg');}
+      .canvasContainer { width: 300px; text-align: center; display: table; margin: 0 auto; position: relative;}
+      .canvasContainer .pointerGuide { background: url('triangle.png') no-repeat; width: 25px; height: 25px; margin: 24px auto -57px auto; position: relative; z-index: 9; background-size: 25px;}
+      .canvasContainer .buttons-div { margin-top: 0px; text-align: center;}
+      .canvasContainer .buttons-div button { display: block; text-align: center; cursor: pointer;}
+      .canvasContainer .buttons-div .btn-wheel-press-play-spin { width: 100%; color: #FFFFFF; text-transform: uppercase; background: #110f10; border: 1px solid #110f10; padding: 15px 15px; font-size: 20px; margin-bottom: 10px;}
+      .canvasContainer .buttons-div .btn-wheel-play { width: 150px; color: #FFFFFF; text-transform: uppercase; background: #902030; border: 1px solid #902030; padding: 7px 20px; font-size: 15px; margin: 0 auto 5px auto; border-radius: 8px;font-family: Roadster-Regular }
+      .canvasContainer .buttons-div .btn-wheel-cancel { color: #7f7e84; border-bottom: 1px solid #902030; background: none; border-top: none; border-left: none; border-right: none; font-size: 15px; margin: 0 auto 5px auto; padding: 0;}
+   </style>
+
+   <div id="canvasContainer" class="canvasContainer">
+
+      <div class="pointerGuide"></div>
+      <canvas id='myCanvas' width="360" height="400">
+         Canvas not supported, use another browser.
+      </canvas>
+
+      <div class="buttons-div">
+         <button class="btn-wheel-press-play-spin">Press play <br/>to spin</button>
+         <button id='btn-wheel-play' class="btn-wheel-play" onClick="calculatePrizeOnServer();">Play</button>
+         <button class="btn-wheel-cancel" onClick="onClickCancel();" >Cancel</button>
+      </div>
+
+   </div>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TweenMax.min.js"></script>
+
+   <script>
+      var theWheel = new Winwheel({
+         'canvasId'    : 'myCanvas',
+         'drawMode' : 'image',
+         'numSegments' : 6,
+         'pointerAngle' : 0,
+         'rotationAngle':-(360/6)/2,
+         'segments':
+         [
+            {'text' : '100 stars'},
+            {'text' : '30$ voucher'},
+            {'text' : '20$ voucher'},
+            {'text' : 'Better Luck Next Time'},
+            {'text' : '100 stars'},
+            {'text' : '20$ voucher'},
+            {'text' : 'Better Luck Next Time'},
+            {'text' : '30$ voucher'},
+         ],
+         'lineWidth': 4,
+         'animation' :                   // Note animation properties passed in constructor parameters.
+         {
+            'type'     : 'spinToStop',  // Type of animation.
+            'duration' : 5,             // How long the animation is to take in seconds.
+            'spins'    : 3,              // The number of complete 360 degree rotations the wheel is to do.
+            'callbackFinished' : 'alertPrize()',
+         }
+      });
+
+      // Create new image object in memory.
+      var loadedImg = new Image();
+
+      // Create callback to execute once the image has finished loading.
+      loadedImg.onload = function()
+      {
+         theWheel.wheelImage = loadedImg;    // Make wheelImage equal the loaded image object.
+         theWheel.draw();                    // Also call draw function to render the wheel.
+      }
+
+      // Set the image source, once complete this will trigger the onLoad callback (above).
+      loadedImg.src = "hero.png";
+
+      // This function called after the spin animation has stopped.
+      function alertPrize()
+      {
+         //alert(segmentLabel);
+         //console.log(segmentLabel);
+         window.postMessage( titleLabel+"_"+segmentLabel);
+      }
+
+    function onClickCancel(){
+       window.postMessage( "onClickCancel");
+    }
+
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = ajaxStateChange;
+
+      // Function called on click of spin button.
+      var levelID;
+      var LoyaltyID;
+      function calculatePrizeOnServer()
+      {
+
+         var data = "token=eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.IjIxIg.IPqjWJTLJnBZ8jKXQG8Yw2G55F54vyTtEIE4xMXlgE8&organization_id=21&LoyaltyId="+LoyaltyID+"&LoyaltyLevelId="+levelID+"&WheelId=1";
+
+         var xhr = new XMLHttpRequest();
+
+         xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+               document.getElementById("btn-wheel-play").disabled = true;
+               console.log(xhr.responseText);
+               var myObj = JSON.parse(xhr.responseText);
+               segmentNumber = myObj.data.Sorting;   // The segment number should be in response.
+               segmentLabel = myObj.data.Label;   // The segment number should be in response.
+               titleLabel=myObj.data.LabelTitle;
+               if (segmentNumber)
+               {
+                  // Get random angle inside specified segment of the wheel.
+                  var stopAt = theWheel.getRandomForSegment(segmentNumber);
+                  // Important thing is to set the stopAngle of the animation before stating the spin.
+                  theWheel.animation.stopAngle = stopAt;
+                  // Start the spin animation here.
+                  theWheel.startAnimation();
+               }
+            }
+         });
+
+         xhr.open("POST", "https://agora.ventures/apiv2/games/wheelspin");
+         xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+         xhr.send(data);
+      }
+
+      function ajaxStateChange()
+      {
+         if (xhr.readyState < 4)
+         {
+            return;
+         }
+
+         if (xhr.status !== 200)
+         {
+            return;
+         }
+
+         // The request has completed.
+         if (xhr.readyState === 4)
+         {
+            var segmentNumber = xhr.responseText;   // The segment number should be in response.
+
+            if (segmentNumber)
+            {
+               // Get random angle inside specified segment of the wheel.
+               var stopAt = theWheel.getRandomForSegment(segmentNumber);
+
+               // Important thing is to set the stopAngle of the animation before stating the spin.
+               theWheel.animation.stopAngle = stopAt;
+
+               // Start the spin animation here.
+
+            }
+         }
+      }
+      document.addEventListener("message", function(event) {
+
+         if (event.data === 'Play') {
+
+            theWheel.startAnimation();
+         }else if (event.data === 'Challenger') {
+
+            loadedImg.src = 'challenger.png';
+         }else if (event.data === 'Champion') {
+
+            loadedImg.src = 'champ.png';
+         }else if (event.data === 'Hero') {
+
+            loadedImg.src = 'hero.png';
+         }
+         else if (event.data === '1') {
+            levelID = 1;
+         }
+         else if (event.data === '2') {
+            levelID = 2;
+         }
+         else if (event.data === '3') {
+            levelID = 3;
+         }
+         else{
+            LoyaltyID=event.data
+         }
+      }, false);
+   </script>
+
+
+</body>
+</html>

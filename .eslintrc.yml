@@ -1,0 +1,51 @@
+root: true
+parser: babel-eslint
+# extends: airbnb
+rules:
+    max-len: [2, 100, 2, { ignoreUrls: true, ignoreComments: false, ignorePattern: "^(import|\\s+\\w+?: |\\s+\\w+? \\w+? = )" }]
+    func-names: 0
+    semi: [2, always]
+    no-unexpected-multiline: 2
+    no-shadow: 1
+    camelcase: 1
+    comma-dangle: [error, only-multiline]
+    no-mixed-operators:
+     - 'warn'
+
+    import/extensions: 0
+    import/imports-first: 2
+    import/no-commonjs: 2
+    import/no-duplicates: 2
+    import/no-named-as-default: 1
+    import/named: 2
+    import/prefer-default-export: 0
+    import/no-unresolved: [2, { ignore: ['^libs', '^config'] }]
+    import/no-extraneous-dependencies:
+      - 'error'
+      - devDependencies: true
+
+    jsx-a11y/img-has-alt: 0
+    jsx-a11y/alt-text: 0
+    jsx-a11y/no-autofocus: 0
+    jsx-a11y/no-static-element-interactions: 0
+    jsx-a11y/media-has-caption: 1
+    jsx-a11y/click-events-have-key-events: 0
+
+    react/display-name: 1
+    react/jsx-no-duplicate-props: 2
+    react/jsx-key: 2
+    react/jsx-filename-extension: 0
+    # react/jsx-wrap-multilines: 0
+    react/no-unescaped-entities: 0 # very unlikely to cause issues, very annoying to have on.
+    react/no-string-refs: 2
+    react/forbid-component-props: 1
+    react/forbid-prop-types: 2
+    react/require-default-props: 0
+    react/prop-types: 1
+    react/no-array-index-key: 1 # see https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318
+env:
+    browser: true
+    jasmine: true
+globals:
+  window: true
+  jest: true
